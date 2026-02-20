@@ -1,13 +1,16 @@
 export interface VibeCheckConfig {
     siteConfig: SiteConfig
-    cache: Cache
 }
 
 export interface SiteConfig {
-    posts: string[]
-}
-export interface Cache {
-
+    posts: string[],
+    wait: string[],
+    fields: {
+        user_name: [string, ...(number|string)[]],
+        user_id: [string, ...(number|string)[]],
+        body: [string, ...(number|string)[]],
+        extra?: [string, ...(number|string)[]]
+    }
 }
 
 declare global {

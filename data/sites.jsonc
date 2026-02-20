@@ -1,10 +1,31 @@
 {
     "x.com": {
+        "wait": [
+            "*[role='progressbar']"
+        ],
         "posts": [
             "article[data-testid='tweet']"
-        ]
-    },
-    "x.com/home": {
-        "a":2
+        ],
+        "fields": {
+            "user_name": [
+                "*[data-testid='User-Name']",
+                0
+            ],
+            "user_id": [
+                "*[data-testid='User-Name']",
+                1,
+                0,
+                0
+            ],
+            "body": [
+                "*[data-testid='tweetText']"
+            ],
+            "extra": [
+                "*[data-testid='tweetText']",
+                -1,
+                -1,
+                "extra/x.com"
+            ]
+        }
     }
 }

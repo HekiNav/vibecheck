@@ -11,7 +11,6 @@ function addBanner() {
 const observer = new MutationObserver(onDomChange);
 /**
  * @typedef {import("./global.d.ts")}
- * @typedef {import("./global.d.ts").Cache} VibeCheckCache
  * @typedef {import("./global.d.ts").SiteConfig} SiteConfig
  * @typedef {import("./global.d.ts").VibeCheckConfig} VibeCheckConfig
  */
@@ -21,7 +20,57 @@ const observer = new MutationObserver(onDomChange);
  */
 function onDomChange(changes, observer) {
     const posts = Array.from(document.querySelectorAll(window.vibeCheck.siteConfig.posts.join(", ")))
-    console.log(posts.map(p => p.textContent))
+    posts.forEach(p => {
+        // if already checked or ignoring for now (wait for load), return
+        if (
+            p.hasAttribute("data-vibecheck-id") ||
+            (
+                window.vibeCheck.siteConfig.wait &&
+                p.querySelectorAll(window.vibeCheck.siteConfig.wait.join(", ")).length
+            )
+        ) return
+        p.setAttribute("data-vibecheck-id", crypto.randomUUID())
+        const postData = parsePost(p)
+        console.log(postData)
+    })
+}
+/**
+ * 
+ * @param {Element} post 
+ */
+function parsePost(post) {
+    return /** @type {{[key in keyof typeof window.vibeCheck.siteConfig.fields]: any}} */ (Object.fromEntries(Object.entries(window.vibeCheck.siteConfig.fields).map(([k, [selector, ...indexes]]) => {
+        const element = post.querySelector(selector)
+        if (!indexes || !indexes.length) return [k, element ? element.textContent : null]
+        return [k, indexes.reduce(
+            (prev, curr, i, a) => {
+                if (!prev) return null
+                const e = (() => {
+                    const el = /** @type {Element} */ (prev)
+                    if (typeof curr == "string") return specialParse(curr, el)
+                    if (curr == -1) return el.parentElement
+                    return /** @type {Element | null} */ (el.childNodes[curr])
+                })()
+                return i == a.length - 1 ? (e && e.textContent) : e
+            }, /** @type {string | Element | null} */(element))]
+    })))
+}
+/**
+ * 
+ * @param {string} type 
+ * @param {Element} el 
+ */
+function specialParse(type, el) {
+    switch (type) {
+        case "extra/x.com":
+            const card = el.querySelector(`div[data-testid]`)
+            if (card && card.textContent) return card 
+            console.log(el)
+            return null
+        default:
+            console.warn(`%c VibeCheck extension: No implemented specialParse handler for ${type}`, 'color: #4285f4; font-weight: bold;')
+            return el
+    }
 }
 
 (async () => {
