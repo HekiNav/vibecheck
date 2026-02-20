@@ -1,5 +1,13 @@
 export interface VibeCheckConfig {
-    myString: string;
+    siteConfig: SiteConfig
+    cache: Cache
+}
+
+export interface SiteConfig {
+    posts: string[]
+}
+export interface Cache {
+
 }
 
 declare global {

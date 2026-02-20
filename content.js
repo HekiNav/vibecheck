@@ -11,27 +11,33 @@ function addBanner() {
 const observer = new MutationObserver(onDomChange);
 /**
  * @typedef {import("./global.d.ts")}
+ * @typedef {import("./global.d.ts").Cache} VibeCheckCache
+ * @typedef {import("./global.d.ts").SiteConfig} SiteConfig
+ * @typedef {import("./global.d.ts").VibeCheckConfig} VibeCheckConfig
  */
 /**
  * @param {MutationRecord[]} changes
  * @param {MutationObserver} observer
  */
 function onDomChange(changes, observer) {
-    console.log(changes, window.vibeCheck)
+    const posts = Array.from(document.querySelectorAll(window.vibeCheck.siteConfig.posts.join(", ")))
+    console.log(posts.map(p => p.textContent))
 }
 
 (async () => {
     const contentConfig = await getData("sites.jsonc")
 
+    // @ts-ignore
+    window.vibeCheck = {
+        siteConfig: /** @type {SiteConfig} */ (getConfig(contentConfig))
+    }
+
     observer.observe(document.body, {
         childList: true,
         subtree: true
     })
+    onDomChange([], observer)
 
-    // @ts-ignore
-    globalThis.vibecheck = {
-        siteConfig: getConfig(contentConfig)
-    }
     addBanner()
 })()
 

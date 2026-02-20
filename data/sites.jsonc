@@ -1,7 +1,8 @@
 {
     "x.com": {
-        "a": 1,
-        "b": 2
+        "posts": [
+            "article[data-testid='tweet']"
+        ]
     },
     "x.com/home": {
         "a":2
