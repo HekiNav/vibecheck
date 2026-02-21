@@ -11,6 +11,9 @@ export default defineConfig({
       '@': `${path.resolve(__dirname, 'src')}`,
     },
   },
+  build: {
+    minify: false
+  },
   plugins: [
     crx({ manifest }),
     zip({ outDir: 'release', outFileName: `${name}-${version}.zip` }),

@@ -17,6 +17,8 @@
     "vite-plugin-zip-pack": "^1.2.4"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "onnxruntime-web": "^1.24.2",
     "webextension-polyfill": "^0.12.0"
   }
 }

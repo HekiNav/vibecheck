@@ -13,6 +13,9 @@ export default defineManifest({
       48: "public/logo.png",
     },
   },
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
   content_scripts: [{
     js: ["src/content/main.ts"],
     css: ["src/assets/style.css"],
@@ -31,6 +34,7 @@ export default defineManifest({
   },
   permissions: [
     "activeTab",
+    "storage"
   ],
   web_accessible_resources: [
     {

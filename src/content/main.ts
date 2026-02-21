@@ -26,6 +26,9 @@ function onDomChange(_changes: MutationRecord[], _observer: MutationObserver) {
         p.setAttribute("data-vibecheck-id", crypto.randomUUID())
         const postData = parsePost(p)
         console.log(postData)
+        classify(Object.values(postData).filter((e) => typeof e === "string")).then(data => {
+            console.log("analysis", data)
+        })
     })
 }
 
@@ -100,4 +103,8 @@ function getConfig(config: {[key:string]:any}) {
 async function getData(filename: string): Promise<any> {
     //@ts-expect-error
     return await browser.runtime.sendMessage({ type: "getData", file: filename })
+}
+async function classify(fields: string[]): Promise<any> {
+    //@ts-expect-error
+    return await browser.runtime.sendMessage({ type: "classify", fields })
 }
