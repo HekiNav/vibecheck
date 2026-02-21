@@ -1,6 +1,8 @@
-//@ts-check
+import { SiteConfig } from "~/background";
+
 // @ts-ignore
-globalThis.browser = typeof browser !== "undefined" ? browser : chrome;
+(globalThis as any).browser = typeof browser !== "undefined" ? browser : chrome;
+
 function addBanner() {
     const banner = document.createElement("div");
     banner.className = "extension-banner";
@@ -9,16 +11,8 @@ function addBanner() {
 }
 
 const observer = new MutationObserver(onDomChange);
-/**
- * @typedef {import("./global.d.ts")}
- * @typedef {import("./global.d.ts").SiteConfig} SiteConfig
- * @typedef {import("./global.d.ts").VibeCheckConfig} VibeCheckConfig
- */
-/**
- * @param {MutationRecord[]} changes
- * @param {MutationObserver} observer
- */
-function onDomChange(changes, observer) {
+
+function onDomChange(_changes: MutationRecord[], _observer: MutationObserver) {
     const posts = Array.from(document.querySelectorAll(window.vibeCheck.siteConfig.posts.join(", ")))
     posts.forEach(p => {
         // if already checked or ignoring for now (wait for load), return
@@ -34,11 +28,8 @@ function onDomChange(changes, observer) {
         console.log(postData)
     })
 }
-/**
- * 
- * @param {Element} post 
- */
-function parsePost(post) {
+
+function parsePost(post: Element) {
     return /** @type {{[key in keyof typeof window.vibeCheck.siteConfig.fields]: any}} */ (Object.fromEntries(Object.entries(window.vibeCheck.siteConfig.fields).map(([k, [selector, ...indexes]]) => {
         const element = post.querySelector(selector)
         if (!indexes || !indexes.length) return [k, element ? element.textContent : null]
@@ -46,21 +37,17 @@ function parsePost(post) {
             (prev, curr, i, a) => {
                 if (!prev) return null
                 const e = (() => {
-                    const el = /** @type {Element} */ (prev)
+                    const el = prev as Element
                     if (typeof curr == "string") return specialParse(curr, el)
                     if (curr == -1) return el.parentElement
-                    return /** @type {Element | null} */ (el.childNodes[curr])
+                    return el.childNodes[curr] as Element | null
                 })()
                 return i == a.length - 1 ? (e && e.textContent) : e
-            }, /** @type {string | Element | null} */(element))]
+            }, (element as string | Element | null))]
     })))
 }
-/**
- * 
- * @param {string} type 
- * @param {Element} el 
- */
-function specialParse(type, el) {
+
+function specialParse(type: string, el: Element) {
     switch (type) {
         // parse quotes and other attached things
         case "extra/x.com":
@@ -71,27 +58,27 @@ function specialParse(type, el) {
                 const card = curr.querySelector(`div[data-testid]`)
                 if (card && card.textContent) return [...prev, card]
                 // quotes
-                console.log(curr.textContent.slice(0, 5))
-                if (curr.textContent.slice(0, 5) == "Quote") {
+                if (curr.textContent?.slice(0, 5) == "Quote") {
                     const quoteBody = curr.querySelector("*[data-testid='tweetText']")
                     if (quoteBody) return [...prev, quoteBody]
                 }
                 return prev
-            }, /** @type {(Element)[]} */([]))
+            }, new Array<Element>())
             return extraContent[0] || null
 
         default:
-            console.warn(`%c VibeCheck extension: No implemented specialParse handler for ${type}`, 'color: #4285f4; font-weight: bold;')
+            console.log(`%c VibeCheck extension: No implemented specialParse handler for ${type}`, 'color: #4285f4; font-weight: bold;')
             return el
     }
 }
 
 (async () => {
+    console.log("initted")
     const contentConfig = await getData("sites.jsonc")
 
     // @ts-ignore
     window.vibeCheck = {
-        siteConfig: /** @type {SiteConfig} */ (getConfig(contentConfig))
+        siteConfig: getConfig(contentConfig) as SiteConfig
     }
 
     observer.observe(document.body, {
@@ -103,18 +90,14 @@ function specialParse(type, el) {
     addBanner()
 })()
 
-/**
- * @param {{[key:string]:any}} config
- */
-function getConfig(config) {
+
+function getConfig(config: {[key:string]:any}) {
     const { hostname, pathname } = window.location
     console.log(hostname, pathname)
-    return Object.entries(config).filter(([key]) => key == hostname || key == hostname + pathname).reduceRight((p, [k, v]) => ({ ...v, ...p }), {})
+    return Object.entries(config).filter(([key]) => key == hostname || key == hostname + pathname).reduceRight((p, [, v]) => ({ ...v, ...p }), {})
 }
 
-/**
- * @param {string} filename
- */
-async function getData(filename) {
+async function getData(filename: string): Promise<any> {
+    //@ts-expect-error
     return await browser.runtime.sendMessage({ type: "getData", file: filename })
 }
