@@ -3,5 +3,10 @@ A browsres extension that scans social media/news sites as you browse and blocks
 ## Todo
 - [ ] Extract data from sites
     - [ ] Youtube
-- [ ] Make an NLP model run in the brower
+    - [ ] Instagram
+    - [x] X/Twitter
+- [ ] Make an NLP model run in the browser
 - [ ] Block content
+- [ ] Add configuration
+    - [ ] UI
+    - [ ] Technical implementation

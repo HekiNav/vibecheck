@@ -62,11 +62,24 @@ function parsePost(post) {
  */
 function specialParse(type, el) {
     switch (type) {
+        // parse quotes and other attached things
         case "extra/x.com":
-            const card = el.querySelector(`div[data-testid]`)
-            if (card && card.textContent) return card 
-            console.log(el)
-            return null
+            const childArray = Array.from(el.children)
+            const extras = childArray.slice(2, childArray.length - 1)
+            const extraContent = extras.reduce((prev, curr) => {
+                // cards
+                const card = curr.querySelector(`div[data-testid]`)
+                if (card && card.textContent) return [...prev, card]
+                // quotes
+                console.log(curr.textContent.slice(0, 5))
+                if (curr.textContent.slice(0, 5) == "Quote") {
+                    const quoteBody = curr.querySelector("*[data-testid='tweetText']")
+                    if (quoteBody) return [...prev, quoteBody]
+                }
+                return prev
+            }, /** @type {(Element)[]} */([]))
+            return extraContent[0] || null
+
         default:
             console.warn(`%c VibeCheck extension: No implemented specialParse handler for ${type}`, 'color: #4285f4; font-weight: bold;')
             return el
