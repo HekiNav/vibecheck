@@ -29,7 +29,7 @@ function onDomChange(_changes: MutationRecord[], _observer: MutationObserver) {
         const arr = [postData.body]
         if (postData.extra) arr.push(postData.extra)
         classify(arr).then(data => {
-            console.log("analysis", data.map((e:any) => e.label), postData.user_id)
+            console.log("analysis",data, postData.user_id, arr)
         })
     })
 }

@@ -27,7 +27,7 @@ class Singleton {
         return (this.fn ??= async (...args) => {
             this.instance ??= pipeline(
                 "text-classification",
-                "SamLowe/roberta-base-go_emotions",
+                "SamLowe/roberta-base-go_emotions-onnx",
                 {
                     progress_callback,
                     device: "wasm",

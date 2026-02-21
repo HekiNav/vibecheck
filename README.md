@@ -1,5 +1,8 @@
 # Vibecheck (temp name)
 A browsres extension that scans social media/news sites as you browse and blocks posts/articles/videos that it deemes too negative (configurable, also other feelings)
+## Installation
+1. `npm install`
+2. Copy all files from `node_modules/onnxruntime-web/` to `public/onnx-wasm`
 ## Todo
 - [ ] Extract data from sites
     - [ ] Youtube
