@@ -27,7 +27,7 @@ class Singleton {
         return (this.fn ??= async (...args) => {
             this.instance ??= pipeline(
                 "text-classification",
-                "SamLowe/roberta-base-go_emotions-onnx",
+                "SamLowe/roberta-base-go_emotions",
                 {
                     progress_callback,
                     device: "wasm",
@@ -40,11 +40,8 @@ class Singleton {
         });
     }
 }
-(async () => {
-    console.log("classify: ", await classify("We are ready for real compromises. But not compromises at the cost of our independence and sovereignty. We are ready to speak about compromises with the United States. But not to get ultimatums from the Russians again and again. They are the aggressor. Everybody has recognized"))
-})()
 
-async function classify(texts: string) {
+async function classify(...texts: string[]) {
     const classifier = await Singleton.getInstance((data) => {
         console.log(data)
     });
@@ -85,6 +82,6 @@ browser.runtime.onMessage.addListener((msg: any, _sender: any) => {
         return loadData(message.file);
     }
     if (message.type === "classify") {
-        return classify(message.fields[0])
+        return classify(...message.fields)
     }
 });

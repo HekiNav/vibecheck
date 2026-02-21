@@ -26,14 +26,16 @@ function onDomChange(_changes: MutationRecord[], _observer: MutationObserver) {
         p.setAttribute("data-vibecheck-id", crypto.randomUUID())
         const postData = parsePost(p)
         console.log(postData)
-        classify(Object.values(postData).filter((e) => typeof e === "string")).then(data => {
-            console.log("analysis", data)
+        const arr = [postData.body]
+        if (postData.extra) arr.push(postData.extra)
+        classify(arr).then(data => {
+            console.log("analysis", data.map((e:any) => e.label), postData.user_id)
         })
     })
 }
 
 function parsePost(post: Element) {
-    return /** @type {{[key in keyof typeof window.vibeCheck.siteConfig.fields]: any}} */ (Object.fromEntries(Object.entries(window.vibeCheck.siteConfig.fields).map(([k, [selector, ...indexes]]) => {
+    return (Object.fromEntries(Object.entries(window.vibeCheck.siteConfig.fields).map(([k, [selector, ...indexes]]) => {
         const element = post.querySelector(selector)
         if (!indexes || !indexes.length) return [k, element ? element.textContent : null]
         return [k, indexes.reduce(
@@ -47,7 +49,7 @@ function parsePost(post: Element) {
                 })()
                 return i == a.length - 1 ? (e && e.textContent) : e
             }, (element as string | Element | null))]
-    })))
+    })) as {[key in keyof typeof window.vibeCheck.siteConfig.fields]: string})
 }
 
 function specialParse(type: string, el: Element) {
