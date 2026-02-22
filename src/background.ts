@@ -1,24 +1,21 @@
 import browser from "webextension-polyfill"
 import { env, pipeline, ProgressCallback } from "@huggingface/transformers"
 
+// configure transformers.js to use local WASM and models
+// models are local because they need conversion to onnx, only some models support it out of the box
+// wasm is downloaded from huggingface.co by default, but blocked by the browser
 env.useBrowserCache = true
-env.allowRemoteModels = true
+env.allowRemoteModels = false
+env.allowLocalModels = true
+env.localModelPath = "/models/"
 if (env.backends.onnx.wasm) env.backends.onnx.wasm.wasmPaths = "/onnx-wasm/"
-
-let cachedData: { [key: string]: any } = {}
-
-async function loadData(file: string) {
-    if (cachedData[file]) return cachedData[file]
-    const url = browser.runtime.getURL(`src/assets/data/${file}`)
-    return await (await fetch(url)).json()
-}
 
 declare global {
     interface Window {
         vibeCheck: VibeCheckConfig;
     }
 }
-
+// example from transformers.js (model is initialized only on demand)
 class Singleton {
     static fn: (...args: any[]) => Promise<any>
     static instance: any
@@ -49,6 +46,16 @@ async function classify(...texts: string[]) {
     const result = await classifier(texts);
     return result;
 };
+
+// cache config files if requested multiple times in short period of time
+let cachedData: { [key: string]: any } = {}
+
+async function loadData(file: string) {
+    if (cachedData[file]) return cachedData[file]
+    const url = browser.runtime.getURL(`src/assets/data/${file}`)
+    return await (await fetch(url)).json()
+}
+
 
 export interface VibeCheckConfig {
     siteConfig: SiteConfig
